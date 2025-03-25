@@ -1,0 +1,11 @@
+# Normalizar todos los archivos de texto a LF en el repositorio
+* text=auto eol=lf
+
+# Asegurarse de que ciertos archivos (como scripts) siempre usen LF
+*.py text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+
+# Archivos binarios (como imágenes) no deben ser tratados como texto
+*.png binary
+*.jpg binary

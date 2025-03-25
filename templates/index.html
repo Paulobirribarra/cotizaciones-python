@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Generar Cotización</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .producto {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #agregar-producto {
+            background-color: #28a745;
+        }
+        #agregar-producto:hover {
+            background-color: #218838;
+        }
+        .flash-messages {
+            max-width: 800px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .flash-messages .success {
+            color: #28a745;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .flash-messages .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generar Cotización</h1>
+
+    <!-- Mostrar mensajes flash -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <form method="POST" action="/">
+        <label for="nombre_remitente">Nombre del Remitente:</label>
+        <input type="text" id="nombre_remitente" name="nombre_remitente" placeholder="Nombre Remitente" required>
+
+        <label for="cargo_remitente">Cargo del Remitente:</label>
+        <input type="text" id="cargo_remitente" name="cargo_remitente" placeholder="Cargo Remitente" required>
+
+        <label for="rut_remitente">RUT del Remitente:</label>
+        <input type="text" id="rut_remitente" name="rut_remitente" placeholder="{{ rut_remitente }}" required>
+
+        <label for="correo_remitente">Correo del Remitente:</label>
+        <input type="text" id="correo_remitente" name="correo_remitente" placeholder="correo@ejemplo.com" required>
+
+        <label for="cliente">Cliente:</label>
+        <input type="text" id="cliente" name="cliente" placeholder="{{ cliente }}" required>
+
+        <div id="productos">
+            <div class="producto">
+                <label for="nombre_producto_1">Nombre del Producto:</label>
+                <input type="text" id="nombre_producto_1" name="nombre_producto[]" placeholder="Ej: Laptop" required>
+
+                <label for="codigo_1">Código:</label>
+                <input type="text" id="codigo_1" name="codigo[]" placeholder="Ej: 00482">
+
+                <label for="descripcion_1">Descripción:</label>
+                <textarea id="descripcion_1" name="descripcion[]" placeholder="Ej: Laptop de 16GB RAM"></textarea>
+
+                <label for="cantidad_1">Cantidad:</label>
+                <input type="text" id="cantidad_1" name="cantidad[]" placeholder="Ej: 2" required>
+
+                <label for="valor_con_iva_1">Valor Unitario (IVA incluido):</label>
+                <input type="text" id="valor_con_iva_1" name="valor_con_iva[]" placeholder="Ej: 1000000" required>
+            </div>
+        </div>
+
+        <button type="button" id="agregar-producto">Agregar Producto</button>
+
+        <label for="especificaciones">Especificaciones Técnicas:</label>
+        <textarea id="especificaciones" name="especificaciones" placeholder="Especificaciones técnicas del producto (opcional)"></textarea>
+
+        <label for="garantia">Garantía:</label>
+        <input type="text" id="garantia" name="garantia" placeholder="{{ garantia }}">
+
+        <label for="tiempo_entrega">Tiempo de Entrega:</label>
+        <input type="text" id="tiempo_entrega" name="tiempo_entrega" placeholder="{{ tiempo_entrega }}">
+
+        <button type="submit">Generar PDF</button>
+    </form>
+
+    <script>
+        let productoCount = 1;
+
+        document.getElementById("agregar-producto").addEventListener("click", function() {
+            productoCount++;
+            const div = document.createElement("div");
+            div.className = "producto";
+            div.innerHTML = `
+                <label for="nombre_producto_${productoCount}">Nombre del Producto:</label>
+                <input type="text" id="nombre_producto_${productoCount}" name="nombre_producto[]" placeholder="Ej: Laptop" required>
+
+                <label for="codigo_${productoCount}">Código:</label>
+                <input type="text" id="codigo_${productoCount}" name="codigo[]" placeholder="Ej: 00482">
+
+                <label for="descripcion_${productoCount}">Descripción:</label>
+                <textarea id="descripcion_${productoCount}" name="descripcion[]" placeholder="Ej: Laptop de 16GB RAM"></textarea>
+
+                <label for="cantidad_${productoCount}">Cantidad:</label>
+                <input type="text" id="cantidad_${productoCount}" name="cantidad[]" placeholder="Ej: 2" required>
+
+                <label for="valor_con_iva_${productoCount}">Valor Unitario (IVA incluido):</label>
+                <input type="text" id="valor_con_iva_${productoCount}" name="valor_con_iva[]" placeholder="Ej: 1000000" required>
+            `;
+            document.getElementById("productos").appendChild(div);
+        });
+    </script>
+</body>
+</html>

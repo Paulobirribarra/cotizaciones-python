@@ -1,0 +1,24 @@
+# Archivos y carpetas a ignorar
+
+# Entorno virtual
+.venv/
+
+# Archivos de entorno
+.env
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+
+# PDFs generados
+PDF/
+
+# Configuraciones del IDE
+.idea/
+.vscode/
+
+# Archivos de logs
+*.log
+
+# Archivos temporales de editores
+*.swp

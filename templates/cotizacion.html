@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cotización</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 100%;
+            height: auto;
+        }
+        .header .title {
+            position: relative;
+        }
+        .header .correlative {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .header .fecha {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .remitente, .cliente, .total, .condiciones, .especificaciones, .agradecimiento, .firma {
+            margin-bottom: 20px;
+        }
+        .remitente p, .cliente p, .total p, .condiciones p, .especificaciones p, .agradecimiento p, .firma p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total-table {
+            width: 50%;
+            margin: 20px 0;
+        }
+        .total-table td {
+            padding: 10px;
+            background-color: #e6f0fa;
+            font-weight: bold;
+        }
+        .condiciones {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .especificaciones {
+            margin-top: 20px;
+        }
+        .agradecimiento {
+            font-style: italic;
+            text-align: center;
+        }
+        .firma {
+            text-align: center;
+            font-size: 14px;
+        }
+        .firma p {
+            margin: 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ logo_base64 }}" alt="Logo Empresa">
+        <div class="title">
+            <h1>Cotización</h1>
+            <div class="correlative">Cotización N°{{ correlative }}</div>
+            <div class="fecha">Fecha: {{ fecha_actual }}</div>
+        </div>
+    </div>
+
+    <div class="remitente">
+        <p><strong>Datos del Remitente</strong></p>
+        <p>Atención: {{ nombre_remitente }}</p>
+        <p>Cargo: {{ cargo_remitente }}</p>
+        <p>RUT: {{ rut_remitente }}</p>
+        <p>Correo: <a href="mailto:{{ correo_remitente }}">{{ correo_remitente }}</a></p>
+    </div>
+
+    <div class="cliente">
+        <p><strong>Cliente</strong></p>
+        <p>{{ cliente }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Ítem</th>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Valor Unitario</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ producto.codigo if producto.codigo else '-' }}</td>
+                <td>{{ producto.nombre }}<br>{{ producto.descripcion }}</td>
+                <td>{{ producto.cantidad }}</td>
+                <td>${{ producto.valor_con_iva | int | format_number }}</td>
+                <td>${{ producto.valor_total_con_iva | int | format_number }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="total-table">
+        <tr>
+            <td>Total Neto:</td>
+            <td>${{ total_neto | int | format_number }}</td>
+        </tr>
+        <tr>
+            <td>IVA (19%):</td>
+            <td>${{ iva | int | format_number }}</td>
+        </tr>
+        <tr>
+            <td>Valor Total (IVA incluido):</td>
+            <td>${{ total_con_iva | int | format_number }}</td>
+        </tr>
+    </table>
+
+    <div class="condiciones">
+        <p>Cotización válida solo hasta agotar stock.</p>
+        <p>Valores IVA incluido.</p>
+        {% if garantia %}
+        <p>Garantía: {{ garantia }}</p>
+        {% endif %}
+        {% if tiempo_entrega %}
+        <p>Tiempo de Entrega: {{ tiempo_entrega }}</p>
+        {% endif %}
+    </div>
+
+    <div class="especificaciones">
+        <p><strong>Especificaciones Técnicas</strong></p>
+        <p>{{ especificaciones if especificaciones else "" }}</p>
+    </div>
+
+    <div class="agradecimiento">
+        <p>Gracias por su confianza en nuestra empresa. Estamos a su disposición para cualquier consulta.</p>
+    </div>
+
+    <div class="firma">
+        <p>Visita nuestra página: <a href="https://www.ejemplo.com/">https://www.ejemplo.com/</a></p>
+        <p>Nombre Remitente</p>
+        <p>Cargo Remitente</p>
+        <p>Asesorías - Ventas - Compra ágil.</p>
+        <p>Habilitados en Proveedores.</p>
+        <p><a href="https://api.whatsapp.com/send?phone=56900000000">Contáctame por WhatsApp</a></p>
+    </div>
+</body>
+</html>

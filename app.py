@@ -81,10 +81,12 @@ def index():
             descripcion = bleach.clean(descripciones[i] if i < len(descripciones) else "")
             try:
                 cantidad = int(cantidades[i] if i < len(cantidades) else 0)
-                valor_con_iva = float(valores_con_iva[i] if i < len(valores_con_iva) else 0)
+                # Reemplazar puntos y convertir a float
+                valor_con_iva_str = valores_con_iva[i] if i < len(valores_con_iva) else "0"
+                valor_con_iva = float(valor_con_iva_str.replace(".", ""))
             except (ValueError, IndexError) as e:
-                flash("Error: La cantidad y el valor unitario deben ser números válidos.", "error")
-                return redirect(url_for("index"))
+                flash("Error: La cantidad debe ser un número entero y el valor unitario un número válido (ingrese sin separadores o con puntos, ej: 1149706 o 1.149.706).", "error")
+                return render_template("index.html", form_data=request.form)
 
             # Calcular valor neto (sin IVA) a partir del valor con IVA
             valor_neto = valor_con_iva / 1.19  # IVA 19%
@@ -170,7 +172,7 @@ def index():
         "garantia": "Garantía Legal 12 meses entregada por la marca.",
         "tiempo_entrega": "Tiempo de entrega inmediata. Producto en stock."
     }
-    return render_template("index.html", **valores_predefinidos)
+    return render_template("index.html", form_data=None, **valores_predefinidos)
 
 if __name__ == "__main__":
     # Nota: debug=True solo debe usarse en desarrollo. En producción, usar debug=False.

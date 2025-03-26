@@ -43,7 +43,7 @@
         .remitente p, .cliente p, .total p, .condiciones p, .especificaciones p, .agradecimiento p, .firma p {
             margin: 5px 0;
         }
-        table {
+        table.productos-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
@@ -52,18 +52,45 @@
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            vertical-align: top;
         }
         th {
             background-color: #f2f2f2;
         }
+        /* Asignar anchos específicos */
+        th:nth-child(1), td:nth-child(1) { width: 5%; }  /* Ítem */
+        th:nth-child(2), td:nth-child(2) { width: 10%; } /* Código */
+        th:nth-child(3), td:nth-child(3) { width: 25%; } /* Nombre */
+        th:nth-child(4), td:nth-child(4) { width: 10%; } /* Cantidad */
+        th:nth-child(5), td:nth-child(5) { width: 20%; } /* Valor Unitario */
+        th:nth-child(6), td:nth-child(6) { width: 20%; } /* Valor Total */
+        /* Fila de especificaciones */
+        .especificaciones-row td {
+            border-top: none;
+            font-size: 12px;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        /* Fila de descripción */
+        .descripcion-row td {
+            border-top: none;
+            font-size: 12px;
+            color: #555;
+        }
+        /* Mover la tabla de totales a la derecha */
         .total-table {
-            width: 50%;
-            margin: 20px 0;
+            width: 40%; /* Reducimos el ancho para que quepa bien */
+            float: right; /* Mueve la tabla al lado derecho */
+            margin: 20px 0 20px 20px; /* Margen para separarla del contenido a la izquierda */
         }
         .total-table td {
             padding: 10px;
             background-color: #e6f0fa;
             font-weight: bold;
+        }
+        /* Asegurar que el contenido después de la tabla de totales no se superponga */
+        .clear {
+            clear: both;
         }
         .condiciones {
             padding: 15px;
@@ -84,6 +111,31 @@
         }
         .firma p {
             margin: 2px 0;
+        }
+        /* Estilo para las especificaciones con saltos de línea */
+        .especificaciones-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .especificaciones-list li {
+            margin-bottom: 5px;
+        }
+        /* Estilo para la descripción con saltos de línea */
+        .descripcion-text {
+            margin: 0;
+            padding-left: 20px;
+            white-space: pre-wrap; /* Respeta los saltos de línea */
+        }
+        .descripcion-text p {
+            margin: 5px 0;
+        }
+        /* Estilo para la descripción como lista */
+        .descripcion-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .descripcion-list li {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -110,31 +162,6 @@
         <p>{{ cliente }}</p>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Ítem</th>
-                <th>Código</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Valor Unitario</th>
-                <th>Valor Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ producto.codigo if producto.codigo else '-' }}</td>
-                <td>{{ producto.nombre }}<br>{{ producto.descripcion }}</td>
-                <td>{{ producto.cantidad }}</td>
-                <td>${{ producto.valor_con_iva | int | format_number }}</td>
-                <td>${{ producto.valor_total_con_iva | int | format_number }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
     <table class="total-table">
         <tr>
             <td>Total Neto:</td>
@@ -150,6 +177,70 @@
         </tr>
     </table>
 
+    <table class="productos-table">
+        <thead>
+            <tr>
+                <th>Ítem</th>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Valor Unitario</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ producto.codigo if producto.codigo else '-' }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.cantidad }}</td>
+                <td>${{ producto.valor_con_iva | int | format_number }}</td>
+                <td>${{ producto.valor_total_con_iva | int | format_number }}</td>
+            </tr>
+            {% if especificaciones %}
+            <tr class="especificaciones-row">
+                <td colspan="6">
+                    <strong>Especificaciones Técnicas:</strong>
+                    <ul class="especificaciones-list">
+                        {% for spec in especificaciones.split('-') %}
+                            {% if spec.strip() %}
+                                <li>{{ spec.strip() }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endif %}
+            {% if producto.descripcion %}
+            <tr class="descripcion-row">
+                <td colspan="6">
+                    {% if producto.descripcion.startswith('-') %}
+                    <ul class="descripcion-list">
+                        {% for line in producto.descripcion.split('-') %}
+                            {% if line.strip() %}
+                                <li>{{ line.strip() }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="descripcion-text">
+                        {% for line in producto.descripcion.split('\n') %}
+                            {% if line.strip() %}
+                                <p>{{ line.strip() }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="clear"></div> <!-- Limpiar el float para que los elementos siguientes no se superpongan -->
+
     <div class="condiciones">
         <p>Cotización válida solo hasta agotar stock.</p>
         <p>Valores IVA incluido.</p>
@@ -159,11 +250,6 @@
         {% if tiempo_entrega %}
         <p>Tiempo de Entrega: {{ tiempo_entrega }}</p>
         {% endif %}
-    </div>
-
-    <div class="especificaciones">
-        <p><strong>Especificaciones Técnicas</strong></p>
-        <p>{{ especificaciones if especificaciones else "" }}</p>
     </div>
 
     <div class="agradecimiento">

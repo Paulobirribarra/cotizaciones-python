@@ -35,6 +35,12 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+        /* Ajustar el textarea */
+        textarea {
+            resize: none; /* Evita que el usuario cambie el tamaño */
+            height: 100px; /* Altura fija */
+            overflow-y: auto; /* Barra de desplazamiento vertical si el contenido es extenso */
+        }
         .producto {
             border: 1px solid #ddd;
             padding: 10px;
@@ -96,21 +102,42 @@
 
     <form method="POST" action="/">
         <label for="nombre_remitente">Nombre del Remitente:</label>
-        <input type="text" id="nombre_remitente" name="nombre_remitente" placeholder="Nombre Remitente" required>
+        <input type="text" id="nombre_remitente" name="nombre_remitente" value="{{ form_data['nombre_remitente'] if form_data and 'nombre_remitente' in form_data else '' }}" placeholder="Nombre Remitente" required>
 
         <label for="cargo_remitente">Cargo del Remitente:</label>
-        <input type="text" id="cargo_remitente" name="cargo_remitente" placeholder="Cargo Remitente" required>
+        <input type="text" id="cargo_remitente" name="cargo_remitente" value="{{ form_data['cargo_remitente'] if form_data and 'cargo_remitente' in form_data else '' }}" placeholder="Cargo Remitente" required>
 
         <label for="rut_remitente">RUT del Remitente:</label>
-        <input type="text" id="rut_remitente" name="rut_remitente" placeholder="{{ rut_remitente }}" required>
+        <input type="text" id="rut_remitente" name="rut_remitente" value="{{ form_data['rut_remitente'] if form_data and 'rut_remitente' in form_data else rut_remitente }}" placeholder="{{ rut_remitente }}" required>
 
         <label for="correo_remitente">Correo del Remitente:</label>
-        <input type="text" id="correo_remitente" name="correo_remitente" placeholder="correo@ejemplo.com" required>
+        <input type="text" id="correo_remitente" name="correo_remitente" value="{{ form_data['correo_remitente'] if form_data and 'correo_remitente' in form_data else '' }}" placeholder="correo@ejemplo.com" required>
 
         <label for="cliente">Cliente:</label>
-        <input type="text" id="cliente" name="cliente" placeholder="{{ cliente }}" required>
+        <input type="text" id="cliente" name="cliente" value="{{ form_data['cliente'] if form_data and 'cliente' in form_data else cliente }}" placeholder="{{ cliente }}" required>
 
         <div id="productos">
+            {% if form_data and 'nombre_producto[]' in form_data %}
+                {% for i in range(form_data.getlist('nombre_producto[]')|length) %}
+                <div class="producto">
+                    <label for="nombre_producto_{{ i+1 }}">Nombre del Producto:</label>
+                    <input type="text" id="nombre_producto_{{ i+1 }}" name="nombre_producto[]" value="{{ form_data.getlist('nombre_producto[]')[i] }}" placeholder="Ej: Laptop" required>
+
+                    <label for="codigo_{{ i+1 }}">Código:</label>
+                    <input type="text" id="codigo_{{ i+1 }}" name="codigo[]" value="{{ form_data.getlist('codigo[]')[i] if i < form_data.getlist('codigo[]')|length else '' }}" placeholder="Ej: 00482">
+
+                    <label for="descripcion_{{ i+1 }}">Descripción:</label>
+                    <textarea id="descripcion_{{ i+1 }}" name="descripcion[]" placeholder="Ej: Laptop de 16GB RAM">{{ form_data.getlist('descripcion[]')[i] if i < form_data.getlist('descripcion[]')|length else '' }}</textarea>
+
+                    <label for="cantidad_{{ i+1 }}">Cantidad:</label>
+                    <input type="text" id="cantidad_{{ i+1 }}" name="cantidad[]" value="{{ form_data.getlist('cantidad[]')[i] if i < form_data.getlist('cantidad[]')|length else '' }}" placeholder="Ej: 2" required>
+
+                    <label for="valor_con_iva_{{ i+1 }}">Valor Unitario (IVA incluido):</label>
+                    <input type="text" id="valor_con_iva_{{ i+1 }}" name="valor_con_iva[]" value="{{ form_data.getlist('valor_con_iva[]')[i] if i < form_data.getlist('valor_con_iva[]')|length else '' }}" placeholder="Ej: 1000000 o 1.000.000" required>
+                    <small>Ingrese el valor con o sin puntos como separador de miles.</small>
+                </div>
+                {% endfor %}
+            {% else %}
             <div class="producto">
                 <label for="nombre_producto_1">Nombre del Producto:</label>
                 <input type="text" id="nombre_producto_1" name="nombre_producto[]" placeholder="Ej: Laptop" required>
@@ -125,26 +152,28 @@
                 <input type="text" id="cantidad_1" name="cantidad[]" placeholder="Ej: 2" required>
 
                 <label for="valor_con_iva_1">Valor Unitario (IVA incluido):</label>
-                <input type="text" id="valor_con_iva_1" name="valor_con_iva[]" placeholder="Ej: 1000000" required>
+                <input type="text" id="valor_con_iva_1" name="valor_con_iva[]" placeholder="Ej: 1000000 o 1.000.000" required>
+                <small>Ingrese el valor con o sin puntos como separador de miles.</small>
             </div>
+            {% endif %}
         </div>
 
         <button type="button" id="agregar-producto">Agregar Producto</button>
 
         <label for="especificaciones">Especificaciones Técnicas:</label>
-        <textarea id="especificaciones" name="especificaciones" placeholder="Especificaciones técnicas del producto (opcional)"></textarea>
+        <textarea id="especificaciones" name="especificaciones" placeholder="Ej: -Procesador AMD Ryzen 7\n-Pantalla LED 15.6\"\n-Almacenamiento SSD 512 GB">{{ form_data['especificaciones'] if form_data and 'especificaciones' in form_data else '' }}</textarea>
 
         <label for="garantia">Garantía:</label>
-        <input type="text" id="garantia" name="garantia" placeholder="{{ garantia }}">
+        <input type="text" id="garantia" name="garantia" value="{{ form_data['garantia'] if form_data and 'garantia' in form_data else garantia }}" placeholder="{{ garantia }}">
 
         <label for="tiempo_entrega">Tiempo de Entrega:</label>
-        <input type="text" id="tiempo_entrega" name="tiempo_entrega" placeholder="{{ tiempo_entrega }}">
+        <input type="text" id="tiempo_entrega" name="tiempo_entrega" value="{{ form_data['tiempo_entrega'] if form_data and 'tiempo_entrega' in form_data else tiempo_entrega }}" placeholder="{{ tiempo_entrega }}">
 
         <button type="submit">Generar PDF</button>
     </form>
 
     <script>
-        let productoCount = 1;
+        let productoCount = {{ form_data.getlist('nombre_producto[]')|length if form_data and 'nombre_producto[]' in form_data else 1 }};
 
         document.getElementById("agregar-producto").addEventListener("click", function() {
             productoCount++;
@@ -164,7 +193,8 @@
                 <input type="text" id="cantidad_${productoCount}" name="cantidad[]" placeholder="Ej: 2" required>
 
                 <label for="valor_con_iva_${productoCount}">Valor Unitario (IVA incluido):</label>
-                <input type="text" id="valor_con_iva_${productoCount}" name="valor_con_iva[]" placeholder="Ej: 1000000" required>
+                <input type="text" id="valor_con_iva_${productoCount}" name="valor_con_iva[]" placeholder="Ej: 1000000 o 1.000.000" required>
+                <small>Ingrese el valor con o sin puntos como separador de miles.</small>
             `;
             document.getElementById("productos").appendChild(div);
         });

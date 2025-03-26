@@ -68,6 +68,7 @@ def index():
         # Obtener lista de productos y sanitizarlos
         nombres = request.form.getlist("nombre_producto[]")
         codigos = request.form.getlist("codigo[]")
+        links = request.form.getlist("link[]")
         descripciones = request.form.getlist("descripcion[]")
         cantidades = request.form.getlist("cantidad[]")
         valores_con_iva = request.form.getlist("valor_con_iva[]")
@@ -79,6 +80,7 @@ def index():
             nombre = bleach.clean(nombres[i])
             # Acceder a los otros campos de manera segura
             codigo = bleach.clean(codigos[i] if i < len(codigos) else "")
+            link = bleach.clean(links[i] if i < len(links) else "")
             descripcion = bleach.clean(descripciones[i] if i < len(descripciones) else "")
             try:
                 cantidad = int(cantidades[i] if i < len(cantidades) else 0)
@@ -97,6 +99,7 @@ def index():
             productos.append({
                 "nombre": nombre,
                 "codigo": codigo,
+                "link": link,
                 "descripcion": descripcion,
                 "cantidad": cantidad,
                 "valor_neto": valor_neto,

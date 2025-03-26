@@ -61,10 +61,17 @@
         /* Asignar anchos específicos */
         th:nth-child(1), td:nth-child(1) { width: 5%; }  /* Ítem */
         th:nth-child(2), td:nth-child(2) { width: 10%; } /* Código */
-        th:nth-child(3), td:nth-child(3) { width: 25%; } /* Nombre */
+        th:nth-child(3), td:nth-child(3) { width: 20%; } /* Nombre */
         th:nth-child(4), td:nth-child(4) { width: 10%; } /* Cantidad */
-        th:nth-child(5), td:nth-child(5) { width: 20%; } /* Valor Unitario */
-        th:nth-child(6), td:nth-child(6) { width: 20%; } /* Valor Total */
+        th:nth-child(5), td:nth-child(5) { width: 15%; } /* Valor Unitario */
+        th:nth-child(6), td:nth-child(6) { width: 15%; } /* Valor Total */
+        th:nth-child(7), td:nth-child(7) { width: 10%; } /* Link */
+
+        td.link-cell a {
+        color: #0056b3;
+        text-decoration: underline;
+        }
+
         /* Fila de especificaciones */
         .especificaciones-row {
             page-break-inside: auto; /* Permitir que las especificaciones se dividan */
@@ -74,6 +81,8 @@
             font-size: 12px;
             color: #333;
             background-color: #f9f9f9;
+            display: table-cell;
+            width: 100% !important;
             padding: 4px 8px; /* Reducir el padding */
         }
         /* Fila de descripción */
@@ -201,6 +210,7 @@
                 <th>Cantidad</th>
                 <th>Valor Unitario</th>
                 <th>Valor Total</th>
+                <th>Link</th>
             </tr>
         </thead>
         <tbody>
@@ -212,10 +222,11 @@
                 <td>{{ producto.cantidad }}</td>
                 <td>${{ producto.valor_con_iva | int | format_number }}</td>
                 <td>${{ producto.valor_total_con_iva | int | format_number }}</td>
+                <td class="link-cell"><a href="{{ producto.link if producto.link else '#' }}">Link</a></td>
             </tr>
             {% if especificaciones %}
             <tr class="especificaciones-row">
-                <td colspan="6">
+                <td colspan="7">
                     <strong>Especificaciones Técnicas:</strong>
                     <ul class="especificaciones-list">
                         {% for spec in especificaciones.replace('\n', ' ').replace('  ', ' ').split('-') %}
@@ -229,7 +240,7 @@
             {% endif %}
             {% if producto.descripcion %}
             <tr class="descripcion-row">
-                <td colspan="6">
+                <td colspan="7">
                     {% if producto.descripcion.startswith('-') %}
                     <strong>Características Claves:</strong>
                     <ul class="descripcion-list">

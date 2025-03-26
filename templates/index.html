@@ -126,6 +126,9 @@
                     <label for="codigo_{{ i+1 }}">Código:</label>
                     <input type="text" id="codigo_{{ i+1 }}" name="codigo[]" value="{{ form_data.getlist('codigo[]')[i] if i < form_data.getlist('codigo[]')|length else '' }}" placeholder="Ej: 00482">
 
+                    <label for="link_{{ i+1 }}">Link del Producto:</label>
+                    <input type="text" id="link_{{ i+1 }}" name="link[]" value="{{ form_data.getlist('link[]')[i] if i < form_data.getlist('link[]')|length else '' }}" placeholder="Ej: https://www.c-ram.cl/producto">
+
                     <label for="descripcion_{{ i+1 }}">Descripción:</label>
                     <textarea id="descripcion_{{ i+1 }}" name="descripcion[]" placeholder="Ej: Laptop de 16GB RAM">{{ form_data.getlist('descripcion[]')[i] if i < form_data.getlist('descripcion[]')|length else '' }}</textarea>
 
@@ -144,6 +147,9 @@
 
                 <label for="codigo_1">Código:</label>
                 <input type="text" id="codigo_1" name="codigo[]" placeholder="Ej: 00482">
+
+                <label for="link_1">Link del Producto:</label>
+                <input type="text" id="link_1" name="link[]" placeholder="Ej: https://www.c-ram.cl/producto">
 
                 <label for="descripcion_1">Descripción:</label>
                 <textarea id="descripcion_1" name="descripcion[]" placeholder="Ej: Laptop de 16GB RAM"></textarea>
@@ -185,6 +191,9 @@
 
                 <label for="codigo_${productoCount}">Código:</label>
                 <input type="text" id="codigo_${productoCount}" name="codigo[]" placeholder="Ej: 00482">
+
+                <label for="link_${productoCount}">Link del Producto:</label>
+                <input type="text" id="link_${productoCount}" name="link[]" placeholder="Ej: https://www.c-ram.cl/producto">
 
                 <label for="descripcion_${productoCount}">Descripción:</label>
                 <textarea id="descripcion_${productoCount}" name="descripcion[]" placeholder="Ej: Laptop de 16GB RAM"></textarea>

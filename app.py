@@ -49,7 +49,8 @@ def get_next_correlative():
 
 # Filtro personalizado para formatear números con separadores de miles
 def format_number(value):
-    return "{:,.0f}".format(value).replace(",", ".")
+    value = int(value)
+    return "{:,}".format(value).replace(",", ".")
 
 @app.route("/", methods=["GET", "POST"])
 def index():

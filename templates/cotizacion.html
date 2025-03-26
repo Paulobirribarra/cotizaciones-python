@@ -47,6 +47,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            page-break-inside: auto; /* Permitir que la tabla se divida entre páginas */
         }
         th, td {
             border: 1px solid #ddd;
@@ -65,32 +66,55 @@
         th:nth-child(5), td:nth-child(5) { width: 20%; } /* Valor Unitario */
         th:nth-child(6), td:nth-child(6) { width: 20%; } /* Valor Total */
         /* Fila de especificaciones */
+        .especificaciones-row {
+            page-break-inside: auto; /* Permitir que las especificaciones se dividan */
+        }
         .especificaciones-row td {
             border-top: none;
             font-size: 12px;
             color: #333;
             background-color: #f9f9f9;
+            padding: 4px 8px; /* Reducir el padding */
         }
         /* Fila de descripción */
+        .descripcion-row {
+            page-break-inside: auto; /* Permitir que la descripción se divida */
+        }
         .descripcion-row td {
             border-top: none;
             font-size: 12px;
             color: #555;
+            padding: 4px 8px;
         }
-        /* Mover la tabla de totales a la derecha */
+        /* Tabla de totales */
         .total-table {
-            width: 40%; /* Reducimos el ancho para que quepa bien */
-            float: right; /* Mueve la tabla al lado derecho */
-            margin: 20px 0 20px 20px; /* Margen para separarla del contenido a la izquierda */
+            width: 50%;
+            margin: 20px 0 20px auto;
+            border-collapse: collapse;
+            background-color: #f5f7fa;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #d1d9e6;
+        }
+        total-table tr:first-child td {
+            border-top: 3px solid #007bff;
         }
         .total-table td {
-            padding: 10px;
+            padding: 12px 15px;
+            font-size: 14px;
             background-color: #e6f0fa;
+            color: #333;
             font-weight: bold;
+            border-bottom: 1px solid #d1d9e6;
+            text-align: right;
         }
-        /* Asegurar que el contenido después de la tabla de totales no se superponga */
-        .clear {
-            clear: both;
+        .total-table tr:last-child td {
+        border-bottom: none;
+        font-weight: bold;
+        color: #0056b3;
+        }
+        #valor-total-row td:first-child {
+        white-space: nowrap;
         }
         .condiciones {
             padding: 15px;
@@ -115,27 +139,33 @@
         /* Estilo para las especificaciones con saltos de línea */
         .especificaciones-list {
             margin: 0;
-            padding-left: 20px;
+            padding-left: 15px; /* Reducir el padding de la lista */
         }
         .especificaciones-list li {
-            margin-bottom: 5px;
+            margin: 1px 0; /* Reducir aún más el espaciado entre elementos */
+            padding: 0; /* Eliminar padding adicional */
+            line-height: 1.0; /* Reducir la altura de línea */
         }
         /* Estilo para la descripción con saltos de línea */
         .descripcion-text {
             margin: 0;
-            padding-left: 20px;
+            padding-left: 15px; /* Reducir el padding */
             white-space: pre-wrap; /* Respeta los saltos de línea */
         }
         .descripcion-text p {
-            margin: 5px 0;
+            margin: 1px 0; /* Reducir aún más el espaciado entre párrafos */
+            padding: 0; /* Eliminar padding adicional */
+            line-height: 1.0; /* Reducir la altura de línea */
         }
         /* Estilo para la descripción como lista */
         .descripcion-list {
             margin: 0;
-            padding-left: 20px;
+            padding-left: 15px; /* Reducir el padding de la lista */
         }
         .descripcion-list li {
-            margin-bottom: 5px;
+            margin: 1px 0; /* Reducir aún más el espaciado entre elementos */
+            padding: 0; /* Eliminar padding adicional */
+            line-height: 1.0; /* Reducir la altura de línea */
         }
     </style>
 </head>
@@ -161,21 +191,6 @@
         <p><strong>Cliente</strong></p>
         <p>{{ cliente }}</p>
     </div>
-
-    <table class="total-table">
-        <tr>
-            <td>Total Neto:</td>
-            <td>${{ total_neto | int | format_number }}</td>
-        </tr>
-        <tr>
-            <td>IVA (19%):</td>
-            <td>${{ iva | int | format_number }}</td>
-        </tr>
-        <tr>
-            <td>Valor Total (IVA incluido):</td>
-            <td>${{ total_con_iva | int | format_number }}</td>
-        </tr>
-    </table>
 
     <table class="productos-table">
         <thead>
@@ -203,7 +218,7 @@
                 <td colspan="6">
                     <strong>Especificaciones Técnicas:</strong>
                     <ul class="especificaciones-list">
-                        {% for spec in especificaciones.split('-') %}
+                        {% for spec in especificaciones.replace('\n', ' ').replace('  ', ' ').split('-') %}
                             {% if spec.strip() %}
                                 <li>{{ spec.strip() }}</li>
                             {% endif %}
@@ -216,8 +231,9 @@
             <tr class="descripcion-row">
                 <td colspan="6">
                     {% if producto.descripcion.startswith('-') %}
+                    <strong>Características Claves:</strong>
                     <ul class="descripcion-list">
-                        {% for line in producto.descripcion.split('-') %}
+                        {% for line in producto.descripcion.replace('\n', ' ').replace('  ', ' ').split('-') %}
                             {% if line.strip() %}
                                 <li>{{ line.strip() }}</li>
                             {% endif %}
@@ -239,7 +255,20 @@
         </tbody>
     </table>
 
-    <div class="clear"></div> <!-- Limpiar el float para que los elementos siguientes no se superpongan -->
+    <table class="total-table">
+        <tr>
+            <td>Total Neto:</td>
+            <td>${{ total_neto | int | format_number }}</td>
+        </tr>
+        <tr>
+            <td>IVA (19%):</td>
+            <td>${{ iva | int | format_number }}</td>
+        </tr>
+        <tr id="valor-total-row">
+            <td>Valor Total (IVA incluido):</td>
+            <td>${{ total_con_iva | int | format_number }}</td>
+        </tr>
+    </table>
 
     <div class="condiciones">
         <p>Cotización válida solo hasta agotar stock.</p>
